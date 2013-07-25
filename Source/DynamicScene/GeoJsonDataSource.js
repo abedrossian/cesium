@@ -211,6 +211,9 @@ define([
      * @alias GeoJsonDataSource
      * @constructor
      *
+     * @param {String} [name] The name of this data source.  If undefined, a name will be taken from
+     *                        the name of the GeoJSON file.
+     *
      * @see DataSourceDisplay
      * @see <a href='http://www.geojson.org/'>GeoJSON specification</a>.
      *
@@ -224,7 +227,9 @@ define([
      * defaultPoint.billboard = billboard;
      * dataSource.loadUrl('sample.geojson');
      */
-    var GeoJsonDataSource = function() {
+    var GeoJsonDataSource = function(name) {
+        this._name = name;
+
         //default point
         var defaultPoint = new DynamicObject('GeoJsonDataSource.defaultPoint');
         var point = new DynamicPoint();
@@ -284,6 +289,16 @@ define([
          * @type {DynamicObject}
          */
         this.defaultPolygon = defaultPolygon;
+    };
+
+    /**
+     * Gets the name of this data source.
+     * @memberof GeoJsonDataSource
+     *
+     * @returns {String} The name.
+     */
+    GeoJsonDataSource.prototype.getName = function() {
+        return this._name;
     };
 
     /**
@@ -378,6 +393,10 @@ define([
     GeoJsonDataSource.prototype.load = function(geoJson, source) {
         if (typeof geoJson === 'undefined') {
             throw new DeveloperError('geoJson is required.');
+        }
+
+        if (typeof this._name === 'undefined' && typeof source !== 'undefined') {
+            this._name = source.substr(source.lastIndexOf('/') + 1);
         }
 
         var typeHandler = geoJsonObjectTypes[geoJson.type];
